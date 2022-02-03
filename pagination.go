@@ -1,8 +1,6 @@
 package pagination
 
-import (
-	"math"
-)
+import "math"
 
 // Pager represents an object that can divide items into discrete pages.
 type Pager struct {

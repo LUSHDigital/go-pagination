@@ -10,13 +10,13 @@ type Pager struct {
 // NewPager returns a new Pager or an error.
 // The currentPage and perPage must be positive integers.
 // The total must be a zero or positive integer.
-func NewPager(currentPage, perPage, total int) (*Pager, error) {
+func NewPager(currentPage, perPage, total int) *Pager {
 	return &Pager{
 		currentPage: currentPage,
 		pages:       int(math.Ceil(float64(total) / float64(perPage))),
 		perPage:     perPage,
 		total:       total,
-	}, nil
+	}
 }
 
 // CurrentPage returns the current page number.

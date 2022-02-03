@@ -3,10 +3,7 @@ package pagination
 import "testing"
 
 func TestCurrentPage(t *testing.T) {
-	p, err := NewPager(1, 10, 20)
-	if err != nil {
-		t.Fatal(err)
-	}
+	p := NewPager(1, 10, 20)
 
 	want := 1
 
@@ -16,10 +13,7 @@ func TestCurrentPage(t *testing.T) {
 }
 
 func TestPerPage(t *testing.T) {
-	p, err := NewPager(1, 10, 20)
-	if err != nil {
-		t.Fatal(err)
-	}
+	p := NewPager(1, 10, 20)
 
 	want := 10
 
@@ -29,10 +23,7 @@ func TestPerPage(t *testing.T) {
 }
 
 func TestTotal(t *testing.T) {
-	p, err := NewPager(1, 10, 20)
-	if err != nil {
-		t.Fatal(err)
-	}
+	p := NewPager(1, 10, 20)
 
 	want := 20
 
@@ -42,10 +33,7 @@ func TestTotal(t *testing.T) {
 }
 
 func TestZeroTotal(t *testing.T) {
-	p, err := NewPager(1, 10, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
+	p := NewPager(1, 10, 0)
 
 	if p.NextPage() != 0 {
 		t.Errorf("got %v, want %v", p.NextPage(), 0)
@@ -118,10 +106,7 @@ func TestNonZeroTotal(t *testing.T) {
 			},
 		},
 	} {
-		p, err := NewPager(tc.in.currentPage, tc.in.perPage, tc.in.total)
-		if err != nil {
-			t.Fatal(err)
-		}
+		p := NewPager(tc.in.currentPage, tc.in.perPage, tc.in.total)
 
 		if p.LastPage() != tc.want.lastPage {
 			t.Errorf("LastPage(%+v) got: %v, want: %v", tc.in, p.LastPage(), tc.want.lastPage)

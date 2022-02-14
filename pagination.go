@@ -4,52 +4,35 @@ import "math"
 
 // Pager represents an object that can divide items into discrete pages.
 type Pager struct {
-	currentPage, pages, perPage, total int
+	Total       int  `json:"total"`
+	PerPage     int  `json:"per_page"`
+	CurrentPage int  `json:"current_page"`
+	LastPage    int  `json:"last_page"`
+	NextPage    *int `json:"next_page"`
+	PrevPage    *int `json:"prev_page"`
 }
 
-// NewPager returns a new Pager or an error.
+// NewPager returns a new Pager.
 // The currentPage and perPage must be positive integers.
 // The total must be a zero or positive integer.
 func NewPager(currentPage, perPage, total int) *Pager {
-	return &Pager{
-		currentPage: currentPage,
-		pages:       int(math.Ceil(float64(total) / float64(perPage))),
-		perPage:     perPage,
-		total:       total,
-	}
-}
-
-// CurrentPage returns the current page number.
-func (p Pager) CurrentPage() int {
-	return p.currentPage
-}
-
-// LastPage returns the last page number in the pageset.
-func (p Pager) LastPage() int {
-	return p.pages
-}
-
-// NextPage returns the next page number in the pageset.
-// A returned zero indicates there are no further pages.
-func (p Pager) NextPage() int {
-	if p.currentPage >= p.pages {
-		return 0
+	p := &Pager{
+		Total:       total,
+		PerPage:     perPage,
+		CurrentPage: currentPage,
+		LastPage:    int(math.Ceil(float64(total) / float64(perPage))),
 	}
 
-	return p.currentPage + 1
-}
+	if currentPage < p.LastPage {
+		p.NextPage = new(int)
 
-// PerPage returns the number of items per page in the pageset.
-func (p Pager) PerPage() int {
-	return p.perPage
-}
+		*p.NextPage = currentPage + 1
+	}
+	if currentPage > 1 {
+		p.PrevPage = new(int)
 
-// PrevPage returns the previous page in the pageset.
-func (p Pager) PrevPage() int {
-	return p.currentPage - 1
-}
+		*p.PrevPage = currentPage - 1
+	}
 
-// Total returns the total number of items in the pageset.
-func (p Pager) Total() int {
-	return p.total
+	return p
 }

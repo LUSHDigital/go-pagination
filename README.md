@@ -29,8 +29,8 @@ func main() {
 
 	pager := NewPager(currentPage, perPage, total)
 
-	fmt.Println(pager.PrevPage()) // 1
-	fmt.Println(pager.NextPage()) // 3
-	fmt.Println(pager.LastPage()) // 5
+	fmt.Println(pager.PrevPage) // 1
+	fmt.Println(pager.NextPage) // 3
+	fmt.Println(pager.LastPage) // 5
 }
 ```

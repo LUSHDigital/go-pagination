@@ -1,123 +1,107 @@
 package pagination
 
-import "testing"
+import (
+	"fmt"
+	"reflect"
+	"testing"
+)
 
-func TestCurrentPage(t *testing.T) {
-	p := NewPager(1, 10, 20)
-
-	want := 1
-
-	if p.CurrentPage() != want {
-		t.Errorf("got: %v, want: %v", p.CurrentPage(), want)
-	}
-}
-
-func TestPerPage(t *testing.T) {
-	p := NewPager(1, 10, 20)
-
-	want := 10
-
-	if p.PerPage() != want {
-		t.Errorf("got: %v, want: %v", p.PerPage(), want)
-	}
-}
-
-func TestTotal(t *testing.T) {
-	p := NewPager(1, 10, 20)
-
-	want := 20
-
-	if p.Total() != want {
-		t.Errorf("got: %v, want: %v", p.Total(), want)
-	}
-}
-
-func TestZeroTotal(t *testing.T) {
-	p := NewPager(1, 10, 0)
-
-	if p.NextPage() != 0 {
-		t.Errorf("got %v, want %v", p.NextPage(), 0)
-	}
-
-	if p.PrevPage() != 0 {
-		t.Errorf("got %v, want %v", p.PrevPage(), 2)
-	}
-}
-
-func TestNonZeroTotal(t *testing.T) {
-	type args struct {
-		currentPage, perPage, total int
-	}
-
-	type exp struct {
-		lastPage, nextPage, prevPage int
-	}
-
+func TestNewPager(t *testing.T) {
 	for _, tc := range []struct {
-		in   args
-		want exp
+		currentPage int
+		perPage     int
+		total       int
+		exp         *Pager
 	}{
 		{
-			in: args{
-				currentPage: 2,
-				perPage:     5,
-				total:       2271,
-			},
-			want: exp{
-				lastPage: 455,
-				nextPage: 3,
-				prevPage: 1,
-			},
-		},
-		{
-			in: args{
-				currentPage: 10,
-				perPage:     10,
-				total:       100,
-			},
-			want: exp{
-				lastPage: 10,
-				nextPage: 0,
-				prevPage: 9,
+			currentPage: 1,
+			perPage:     1,
+			total:       10,
+			exp: &Pager{
+				Total:       10,
+				PerPage:     1,
+				CurrentPage: 1,
+				LastPage:    10,
+				NextPage:    intPtr(2),
+				PrevPage:    nil,
 			},
 		},
 		{
-			in: args{
-				currentPage: 1,
-				perPage:     10,
-				total:       10,
-			},
-			want: exp{
-				lastPage: 1,
-				nextPage: 0,
-				prevPage: 0,
+			currentPage: 10,
+			perPage:     1,
+			total:       10,
+			exp: &Pager{
+				Total:       10,
+				PerPage:     1,
+				CurrentPage: 10,
+				LastPage:    10,
+				NextPage:    nil,
+				PrevPage:    intPtr(9),
 			},
 		},
 		{
-			in: args{
-				currentPage: 7,
-				perPage:     10,
-				total:       50,
+			currentPage: 1,
+			perPage:     10,
+			total:       10,
+			exp: &Pager{
+				Total:       10,
+				PerPage:     10,
+				CurrentPage: 1,
+				LastPage:    1,
+				NextPage:    nil,
+				PrevPage:    nil,
 			},
-			want: exp{
-				lastPage: 5,
-				nextPage: 0,
-				prevPage: 6,
+		},
+		{
+			currentPage: 1,
+			perPage:     1,
+			total:       0,
+			exp: &Pager{
+				Total:       0,
+				PerPage:     1,
+				CurrentPage: 1,
+				LastPage:    0,
+				NextPage:    nil,
+				PrevPage:    nil,
+			},
+		},
+		{
+			currentPage: 2,
+			perPage:     33,
+			total:       100,
+			exp: &Pager{
+				Total:       100,
+				PerPage:     33,
+				CurrentPage: 2,
+				LastPage:    4,
+				NextPage:    intPtr(3),
+				PrevPage:    intPtr(1),
+			},
+		},
+		{
+			currentPage: 99,
+			perPage:     1,
+			total:       10,
+			exp: &Pager{
+				Total:       10,
+				PerPage:     1,
+				CurrentPage: 99,
+				LastPage:    10,
+				NextPage:    nil,
+				PrevPage:    intPtr(98),
 			},
 		},
 	} {
-		p := NewPager(tc.in.currentPage, tc.in.perPage, tc.in.total)
+		t.Run(fmt.Sprintf("NewPager(%d,%d,%d)", tc.currentPage, tc.perPage, tc.total), func(t *testing.T) {
+			p := NewPager(tc.currentPage, tc.perPage, tc.total)
 
-		if p.LastPage() != tc.want.lastPage {
-			t.Errorf("LastPage(%+v) got: %v, want: %v", tc.in, p.LastPage(), tc.want.lastPage)
-		}
-
-		if p.NextPage() != tc.want.nextPage {
-			t.Errorf("NextPage(%+v) got: %v, want %v", tc.in, p.NextPage(), tc.want.nextPage)
-		}
-
-		if p.PrevPage() != tc.want.prevPage {
-			t.Errorf("PrevPage(%+v) got: %v, want: %v", tc.in, p.PrevPage(), tc.want.prevPage)
-		}
+			if !reflect.DeepEqual(p, tc.exp) {
+				t.Errorf("got %#v, want %#v", p, tc.exp)
+			}
+		})
 	}
+}
+
+func intPtr(i int) *int {
+	return &i
 }

@@ -27,7 +27,7 @@ func main() {
 
 	total := len(results)
 
-	pager := NewPager(currentPage, perPage, total)
+	pager := pagination.NewPager(currentPage, perPage, total)
 
 	fmt.Println(pager.PrevPage) // 1
 	fmt.Println(pager.NextPage) // 3
